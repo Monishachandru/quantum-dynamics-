@@ -1,0 +1,38 @@
+# quantum_dynamics_qutip.py
+from qutip import sigmax, sigmay, sigmaz, basis, mesolve
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Parameters
+omega = 1.0                 # Hamiltonian frequency
+tmax = 10.0                 # total time
+nsteps = 400                # number of time points
+times = np.linspace(0, tmax, nsteps)
+
+# Hamiltonian: H = 0.5 * omega * sigma_x
+H = 0.5 * omega * sigmax()
+
+# Initial state: |0>
+psi0 = basis(2, 0)
+
+# No collapse operators -> closed system unitary evolution
+c_ops = []
+
+# Observables to record: Pauli X, Y, Z
+e_ops = [sigmax(), sigmay(), sigmaz()]
+
+# Solve Schrödinger equation (or master equation if c_ops nonempty)
+result = mesolve(H, psi0, times, c_ops, e_ops)
+
+# Plot expectation values
+plt.figure(figsize=(8,5))
+plt.plot(times, result.expect[0], label=r'$\langle\sigma_x\rangle$')
+plt.plot(times, result.expect[1], label=r'$\langle\sigma_y\rangle$')
+plt.plot(times, result.expect[2], label=r'$\langle\sigma_z\rangle$')
+plt.xlabel('Time')
+plt.ylabel('Expectation value')
+plt.title('Single-qubit dynamics under H = 0.5 ω σ_x')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
